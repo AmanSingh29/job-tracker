@@ -2,6 +2,7 @@ const Job = require("../models/jobs.mo");
 const ImportLog = require("../models/import_logs.mo");
 const { fetchJobFeedXml } = require("./fetchJobs.service");
 const { parseXmlString } = require("./xmlParser.service");
+const logger = require("../utils/logger.ut");
 
 class JobImportService {
   constructor() {
@@ -34,12 +35,12 @@ class JobImportService {
       });
       logId = importLog._id;
 
-      console.info(`Starting import from feed: ${feedUrl}`);
+      logger.info(`Starting import from feed: ${feedUrl}`);
 
       const rawJobs = await this.#importJobsFromFeed(feedUrl);
       stats.totalFetched = rawJobs.length;
 
-      console.info(`Fetched ${stats.totalFetched} jobs from feed`);
+      logger.info(`Fetched ${stats.totalFetched} jobs from feed`);
 
       const transformedJobs = this.#transformJobs(rawJobs, stats);
 
@@ -47,10 +48,10 @@ class JobImportService {
 
       await this.#finalizeLog(logId, stats, startTime);
 
-      console.info(`Import completed: ${stats.totalImported} jobs imported`);
+      logger.info(`Import completed: ${stats.totalImported} jobs imported`);
       return stats;
     } catch (error) {
-      console.error(`Import failed for ${feedUrl}:`, error);
+      logger.error(`Import failed for ${feedUrl}:`, error);
 
       if (logId) {
         await this.#finalizeLog(logId, stats, startTime, error.message);
@@ -121,7 +122,7 @@ class JobImportService {
   async #processBatches(jobs, stats, logId) {
     const batches = this.#createBatches(jobs, this.BATCH_SIZE);
 
-    console.info(
+    logger.info(
       `Processing ${batches.length} batches of size ${this.BATCH_SIZE}`
     );
 
@@ -133,10 +134,10 @@ class JobImportService {
 
         if ((i + 1) % 10 === 0) {
           await this.#updateProgress(logId, stats);
-          console.info(`Processed ${i + 1}/${batches.length} batches`);
+          logger.info(`Processed ${i + 1}/${batches.length} batches`);
         }
       } catch (error) {
-        console.error(`Batch ${i + 1} failed:`, error);
+        logger.error(`Batch ${i + 1} failed:`, error);
         batch.forEach((job) => {
           stats.failedJobs.push({
             jobData: job,
