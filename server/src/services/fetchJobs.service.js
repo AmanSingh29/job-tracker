@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-async function fetchFeedXml(feedUrl, opts = {}) {
+async function fetchJobFeedXml(feedUrl, opts = {}) {
   const timeout = opts.timeout || 20000;
   try {
     const res = await axios.get(feedUrl, {
@@ -16,4 +16,4 @@ async function fetchFeedXml(feedUrl, opts = {}) {
   }
 }
 
-module.exports = { fetchFeedXml };
+module.exports = { fetchJobFeedXml };
