@@ -7,7 +7,8 @@ const jobQueue = new Queue("job-importer", {
   connection: redisConnection,
   defaultJobOptions: {
     removeOnComplete: {
-      age: 150,
+      age: 60 * 60 * 1000,
+      count: 1000
     },
   },
 });

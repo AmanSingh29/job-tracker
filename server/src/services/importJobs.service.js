@@ -42,7 +42,7 @@ class JobImportService {
       );
       return stats;
     } catch (error) {
-      logger.error(`Import failed for ${feedUrl}:`, error);
+      logger.error(`Import failed for ${feedUrl}:`, error.message);
 
       if (logId) {
         await this.#finalizeLog(logId, stats, startTime, error.message);
