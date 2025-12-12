@@ -7,12 +7,15 @@ const fs = require("fs");
 const globalErrorHandlerMw = require("./src/middlewares/globalErrorHandler.mw");
 const express = require("express");
 const cors = require("cors");
+const { createJobWorker } = require("./src/workers/jobWorker");
 const port = PORT || 7070;
 
 app.use(express.json());
 app.use(cors());
 
-connectDB();
+connectDB().then(() => {
+  createJobWorker();
+});
 
 const models = path.join(__dirname, "/src/models");
 fs.readdirSync(models)
