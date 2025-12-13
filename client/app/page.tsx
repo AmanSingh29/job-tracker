@@ -4,5 +4,5 @@ import { getJobImportHistoryServerAction } from "@/serverActions/getJobImportHis
 export default async function Home() {
   const data = await getJobImportHistoryServerAction();
 
-  return <JobImportHistory data={data.data} />;
+  return <JobImportHistory data={data} />;
 }

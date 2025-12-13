@@ -9,14 +9,7 @@ export interface Column<T> {
 export interface TableProps<T> {
   data: T[];
   columns: Column<T>[];
-  totalItems: number;
-  currentPage: number;
-  pageSize: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (size: number) => void;
   onSort?: (key: string, direction: "asc" | "desc") => void;
-  isLoading?: boolean;
 }
 
 export interface SortState {
