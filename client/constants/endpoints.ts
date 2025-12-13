@@ -1,0 +1,1 @@
+export const GET_IMPORT_JOB_HISTORY_PATH = "/importLog"
