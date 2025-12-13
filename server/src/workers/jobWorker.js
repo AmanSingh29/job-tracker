@@ -1,7 +1,11 @@
 const { Worker } = require("bullmq");
-const processJobService = require("../services/processJob.service");
 const logger = require("../utils/logger.ut");
 const { createRedisConnection } = require("../config/redis");
+const {
+  processJob,
+  updateLogOnSuccess,
+  updateLogOnError,
+} = require("../services/processJob.service");
 
 const createJobWorker = () => {
   const concurrency = parseInt(process.env.WORKER_CONCURRENCY || "10", 10);
@@ -11,7 +15,7 @@ const createJobWorker = () => {
     "job-importer",
     async (job) => {
       const { job: jobData, importLogId } = job.data;
-      return await processJobService.processJob(jobData, importLogId);
+      return await processJob(jobData, importLogId);
     },
     {
       connection,
@@ -19,11 +23,13 @@ const createJobWorker = () => {
     }
   );
 
-  worker.on("completed", (job) => {
+  worker.on("completed", (job, result) => {
+    updateLogOnSuccess(result);
     logger.info(`Job ${job.id} completed successfully`);
   });
 
   worker.on("failed", (job, err) => {
+    updateLogOnError(err);
     logger.error(`Job ${job.id} failed:`, err);
   });
 

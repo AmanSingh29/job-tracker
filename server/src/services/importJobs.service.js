@@ -31,11 +31,11 @@ class JobImportService {
 
       logger.info(`Fetched ${stats.totalFetched} jobs from feed`);
 
-      const transformedJobs = this.#transformJobs(rawJobs, stats);
+      const transformedJobs = this.#transformJobs(rawJobs);
 
       await this.#queueJobs(transformedJobs, stats, logId);
 
-      await this.#finalizeLog(logId, stats, startTime);
+      await this.#finalizeLog(logId, stats);
 
       logger.info(
         `Import queuing completed: ${stats.totalQueued} jobs queued for processing`
@@ -43,11 +43,6 @@ class JobImportService {
       return stats;
     } catch (error) {
       logger.error(`Import failed for ${feedUrl}:`, error.message);
-
-      if (logId) {
-        await this.#finalizeLog(logId, stats, startTime, error.message);
-      }
-
       throw error;
     }
   }
@@ -66,28 +61,10 @@ class JobImportService {
 
   #transformJobs(rawJobs, stats) {
     const transformed = [];
-
     for (const rawJob of rawJobs) {
-      try {
-        const job = this.#mapRawJobToSchema(rawJob);
-
-        if (!job.job_id || !job.title) {
-          stats.failedToQueue.push({
-            jobData: rawJob,
-            reason: "Missing required fields: job_id or title",
-          });
-          continue;
-        }
-
-        transformed.push(job);
-      } catch (error) {
-        stats.failedToQueue.push({
-          jobData: rawJob,
-          reason: `Transformation error: ${error.message}`,
-        });
-      }
+      const job = this.#mapRawJobToSchema(rawJob);
+      transformed.push(job);
     }
-
     return transformed;
   }
 
@@ -111,35 +88,57 @@ class JobImportService {
   }
 
   async #queueJobs(jobs, stats, logId) {
-    logger.info(`Queueing ${jobs.length} jobs for processing`);
+    const BATCH_SIZE = process.env.JOB_BATCH_SIZE || 10000;
+    const totalJobs = jobs.length;
 
-    const queuePromises = jobs.map(async (job) => {
+    logger.info(`Queueing ${totalJobs} jobs in batches of ${BATCH_SIZE}`);
+
+    for (let i = 0; i < totalJobs; i += BATCH_SIZE) {
+      const batch = jobs.slice(i, i + BATCH_SIZE);
+      const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
+      const totalBatches = Math.ceil(totalJobs / BATCH_SIZE);
+
       try {
-        await jobQueue.add("process-job", { job, importLogId: logId });
-        stats.totalQueued++;
+        const bulkJobs = batch.map((job) => ({
+          name: "process-job",
+          data: { job, importLogId: logId },
+        }));
+
+        await jobQueue.addBulk(bulkJobs);
+        stats.totalQueued += batch.length;
+
+        logger.info(
+          `Batch ${batchNumber}/${totalBatches}: Queued ${batch.length} jobs (Total: ${stats.totalQueued}/${totalJobs})`
+        );
+
+        if (i + BATCH_SIZE < totalJobs) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
       } catch (error) {
-        logger.error(`Failed to queue job ${job.job_id}:`, error);
-        stats.failedToQueue.push({
-          jobData: job,
-          reason: `Queue error: ${error.message}`,
+        logger.error(`Failed to queue batch ${batchNumber}:`, error);
+
+        batch.forEach((job) => {
+          stats.failedToQueue.push({
+            jobData: job,
+            reason: `Batch queue error: ${error.message}`,
+          });
         });
       }
-    });
+    }
 
-    await Promise.all(queuePromises);
+    logger.info(
+      `Finished queuing: ${stats.totalQueued} jobs successfully queued`
+    );
   }
 
-  async #finalizeLog(logId, stats, startTime, errorMessage = null) {
+  async #finalizeLog(logId, stats) {
     const endTime = new Date();
-    const duration = endTime - startTime;
 
     await ImportLog.findByIdAndUpdate(logId, {
       total_fetched: stats.totalFetched,
       total_queued: stats.totalQueued,
       total_failed: stats.failedToQueue.length,
       finished_at: endTime,
-      duration_ms: duration,
-      error_message: errorMessage,
       failed_jobs: stats.failedToQueue.slice(0, 100),
     });
   }
