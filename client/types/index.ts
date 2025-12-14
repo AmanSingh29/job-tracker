@@ -16,3 +16,8 @@ export interface SortState {
   key: string | null;
   direction: "asc" | "desc" | null;
 }
+
+export interface SelectOption {
+  label: string;
+  value: string;
+}
