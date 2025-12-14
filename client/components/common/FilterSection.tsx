@@ -10,56 +10,49 @@ const statusOptions: SelectOption[] = [
 ];
 
 const pageSizeOptions: SelectOption[] = [
-  { label: "5", value: "5" },
-  { label: "10", value: "10" },
-  { label: "25", value: "25" },
-  { label: "50", value: "50" },
-  { label: "100", value: "100" },
+  { label: "5", value: 5 },
+  { label: "10", value: 10 },
+  { label: "25", value: 25 },
+  { label: "50", value: 50 },
+  { label: "100", value: 100 },
 ];
 
-interface FilterSectionProps {
+interface FilterState {
   startDate: string;
   endDate: string;
-  selectedStatuses: (string | number)[];
+  selectedStatuses: string;
   pageSize: number;
-  onStartDateChange: (value: string) => void;
-  onEndDateChange: (value: string) => void;
-  onStatusesChange: (value: (string | number)[]) => void;
-  onPageSizeChange: (value: (string | number)[]) => void;
+}
 
-  onApplyFilters: () => void;
+interface FilterSectionProps {
+  filters: FilterState;
+  onFilterChange: (updates: Partial<FilterState>) => void;
   onClearFilters: () => void;
 }
 
 export default function FilterSection({
-  startDate,
-  endDate,
-  selectedStatuses,
-  pageSize,
-  onStartDateChange,
-  onEndDateChange,
-  onStatusesChange,
-  onPageSizeChange,
-  onApplyFilters,
+  filters,
+  onFilterChange,
   onClearFilters,
 }: FilterSectionProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <DateRangeFilter
-          startDate={startDate}
-          endDate={endDate}
-          onStartDateChange={onStartDateChange}
-          onEndDateChange={onEndDateChange}
-          onApply={onApplyFilters}
+          startDate={filters.startDate}
+          endDate={filters.endDate}
+          onStartDateChange={(value) => onFilterChange({ startDate: value })}
+          onEndDateChange={(value) => onFilterChange({ endDate: value })}
           label="Import Date"
           placeholder="Select date range"
         />
 
         <MultiSelectFilter
           options={statusOptions}
-          selectedValues={selectedStatuses}
-          onChange={onStatusesChange}
+          selectedValues={[filters.selectedStatuses]}
+          onChange={(value) =>
+            onFilterChange({ selectedStatuses: String(value[0]) })
+          }
           label="Status"
           placeholder="Select statuses"
           searchable={false}
@@ -68,8 +61,8 @@ export default function FilterSection({
 
         <MultiSelectFilter
           options={pageSizeOptions}
-          selectedValues={[pageSize]}
-          onChange={onPageSizeChange}
+          selectedValues={[filters.pageSize]}
+          onChange={(value) => onFilterChange({ pageSize: Number(value[0]) })}
           label="Page Size"
           placeholder="Select page size"
           searchable={false}

@@ -17,10 +17,10 @@ export function DataTable<T extends Record<string, any>>({
   const handleSort = (columnKey: string) => {
     if (!onSort) return;
 
-    let newDirection: "asc" | "desc" = "asc";
+    let newDirection: "ascending" | "descending" = "ascending";
 
     if (sortState.key === columnKey) {
-      newDirection = sortState.direction === "asc" ? "desc" : "asc";
+      newDirection = sortState.direction === "ascending" ? "descending" : "ascending";
     }
 
     setSortState({ key: columnKey, direction: newDirection });
@@ -31,7 +31,7 @@ export function DataTable<T extends Record<string, any>>({
     if (sortState.key !== columnKey) {
       return <ChevronsUpDown className="w-4 h-4 text-gray-400" />;
     }
-    return sortState.direction === "asc" ? (
+    return sortState.direction === "ascending" ? (
       <ChevronUp className="w-4 h-4 text-blue-600" />
     ) : (
       <ChevronDown className="w-4 h-4 text-blue-600" />

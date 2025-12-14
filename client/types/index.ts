@@ -9,15 +9,15 @@ export interface Column<T> {
 export interface TableProps<T> {
   data: T[];
   columns: Column<T>[];
-  onSort?: (key: string, direction: "asc" | "desc") => void;
+  onSort?: (key: string, direction: "ascending" | "descending") => void;
 }
 
 export interface SortState {
   key: string | null;
-  direction: "asc" | "desc" | null;
+  direction: "ascending" | "descending" | null;
 }
 
 export interface SelectOption {
   label: string;
-  value: string;
+  value: string | number;
 }

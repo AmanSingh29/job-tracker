@@ -30,7 +30,7 @@ export default function MultiSelectFilter({
   placeholder = "Select options",
   className = "",
   searchable = true,
-  mode = "multi",
+  mode = "single",
   closeOnSelect = false,
 }: MultiSelectFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -91,7 +91,9 @@ export default function MultiSelectFilter({
   const getDisplayText = () => {
     if (selectedValues.length === 0) return placeholder;
     if (selectedValues.length === 1) {
-      const selected = options.find((opt) => opt.value === selectedValues[0]);
+      const selected = options.find(
+        (opt) => String(opt.value) === String(selectedValues[0])
+      );
       return selected?.label || placeholder;
     }
     return `${selectedValues.length} selected`;

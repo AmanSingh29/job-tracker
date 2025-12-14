@@ -6,57 +6,80 @@ import { jobImportHistoryColumn } from "@/lib/tableColumns/jobImportHistoryTable
 import Pagination from "../common/Pagination";
 import { getJobImportHistoryServerAction } from "@/serverActions/getJobImportHistory";
 import { TableSkeleton } from "../loaders/TableSkeleton";
-import { SelectOption } from "@/types";
 import FilterSection from "../common/FilterSection";
 
 interface JobImportHistoryProps {
   data: any;
 }
 
+interface FilterState {
+  startDate: string;
+  endDate: string;
+  selectedStatuses: string;
+  pageSize: number;
+  currentPage: number;
+  sort_by?: string;
+  sort_order?: string;
+}
+
 export default function JobImportHistory({ data }: JobImportHistoryProps) {
-  const [currentPage, setCurrentPage] = useState(data.page);
-  const [pageSize, setPageSize] = useState(data.limit || 10);
+  const [filters, setFilters] = useState<FilterState>({
+    startDate: "",
+    endDate: "",
+    selectedStatuses: "",
+    pageSize: data.limit || 10,
+    currentPage: data.page,
+    sort_by: "created_at",
+    sort_order: "descending",
+  });
+
   const [historyData, setHistoryData] = useState<any[]>(data?.data || []);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const [selectedStatuses, setSelectedStatuses] = useState<(string | number)[]>(
-    []
-  );
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     const response = await getJobImportHistoryServerAction({
-      page: currentPage,
-      limit: pageSize,
-      start_date: startDate || undefined,
-      end_date: endDate || undefined,
-      status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
+      page: filters.currentPage,
+      limit: filters.pageSize,
+      start_date: filters.startDate || undefined,
+      end_date: filters.endDate || undefined,
+      status: filters.selectedStatuses || undefined,
+      sort_by: filters.sort_by,
+      sort_order: filters.sort_order,
     });
     const { data } = response;
     setHistoryData(data);
     setLoading(false);
-  }, [currentPage, pageSize, startDate, endDate, selectedStatuses]);
+  }, [filters]);
 
   useEffect(() => {
     fetchData();
-  }, [currentPage, pageSize]);
+  }, [filters]);
 
-  const handleApplyFilters = () => {
-    setCurrentPage(1);
-    fetchData();
+  const updateFilter = (updates: Partial<FilterState>) => {
+    setFilters((prev) => ({
+      ...prev,
+      ...updates,
+      ...(updates.currentPage === undefined && { currentPage: 1 }),
+    }));
   };
 
   const handleClearFilters = () => {
-    setStartDate("");
-    setEndDate("");
-    setSelectedStatuses([]);
-    setCurrentPage(1);
+    setFilters((prev) => ({
+      startDate: "",
+      endDate: "",
+      selectedStatuses: "",
+      pageSize: prev.pageSize,
+      currentPage: 1,
+    }));
   };
 
-  const handleSort = (key: string, direction: "asc" | "desc") => {
-    console.log("Sort by:", key, direction);
+  const handleSort = (key: string, direction: "ascending" | "descending") => {
+    updateFilter({
+      sort_by: key,
+      sort_order: direction,
+      currentPage: filters.currentPage,
+    });
   };
 
   return (
@@ -79,15 +102,8 @@ export default function JobImportHistory({ data }: JobImportHistoryProps) {
         </div>
 
         <FilterSection
-          startDate={startDate}
-          endDate={endDate}
-          selectedStatuses={selectedStatuses}
-          pageSize={pageSize}
-          onStartDateChange={setStartDate}
-          onEndDateChange={setEndDate}
-          onStatusesChange={setSelectedStatuses}
-          onPageSizeChange={setPageSize}
-          onApplyFilters={handleApplyFilters}
+          filters={filters}
+          onFilterChange={updateFilter}
           onClearFilters={handleClearFilters}
         />
 
@@ -106,10 +122,10 @@ export default function JobImportHistory({ data }: JobImportHistoryProps) {
         <div className="mt-2">
           <Pagination
             totalItems={data.total}
-            currentPage={currentPage}
-            pageSize={pageSize}
-            totalPages={Math.ceil(data.total / pageSize)}
-            onPageChange={setCurrentPage}
+            currentPage={filters.currentPage}
+            pageSize={filters.pageSize}
+            totalPages={Math.ceil(data.total / filters.pageSize)}
+            onPageChange={(page) => updateFilter({ currentPage: page })}
           />
         </div>
       </div>
