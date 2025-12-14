@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DataTable } from "../common/DataTable";
 import { jobImportHistoryColumn } from "@/lib/tableColumns/jobImportHistoryTableColumn";
 import Pagination from "../common/Pagination";
@@ -35,6 +35,7 @@ export default function JobImportHistory({ data }: JobImportHistoryProps) {
 
   const [historyData, setHistoryData] = useState<any[]>(data?.data || []);
   const [loading, setLoading] = useState<boolean>(false);
+  const isFirstRender = useRef(true);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -53,6 +54,10 @@ export default function JobImportHistory({ data }: JobImportHistoryProps) {
   }, [filters]);
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     fetchData();
   }, [filters]);
 
