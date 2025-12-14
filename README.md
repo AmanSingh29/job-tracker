@@ -59,19 +59,78 @@ Create a `.env` file inside the `server` folder:
 ```env
 PORT=5050
 
-# Your databse connection uri (cloud or local)
+# Database connection URI (cloud or local)
 MONGODB_URI="mongodb://localhost:27017/job-tracker"
-NODE_ENV="dev" or "production"
 
-# your redis cloud credentials:
+# Environment
+# Allowed values: dev | production
+NODE_ENV="dev"
+
+# Redis configuration
+# If Redis is running locally, you can skip
+# REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
+# After this you will get the steps how to run redis locally
 REDIS_HOST="your-redis-host"
-REDIS_PORT="your-redis-port" or 6379
+REDIS_PORT=6379
 REDIS_PASSWORD="your-redis-password"
 
+# Worker & job configuration
 WORKER_CONCURRENCY=10
 JOB_IMPORT_CRON_TIME="0 * * * *"
 JOB_BATCH_SIZE=10000
 ```
+
+---
+
+# 🧠 Run Redis Locally Using Docker
+
+This project uses **Redis** for queue processing.
+
+---
+
+## 📦 Prerequisites
+
+- Docker must be installed on your system
+- Docker service should be running
+
+---
+
+## ▶️ Start Redis Container
+
+Run the following command in your terminal:
+
+```bash
+docker run -d --name my-redis -p 6379:6379 redis
+```
+
+This command will:
+- Pull the official Redis image (if not already available)
+- Run Redis as a background service using Docker
+- Expose Redis on port `6379`
+
+---
+
+## ✅ Verify Redis Is Running
+
+Connect to the Redis container:
+
+```bash
+docker exec -it my-redis redis-cli
+```
+
+Once connected, run:
+
+```bash
+ping
+```
+
+You should receive the following response:
+
+```bash
+PONG
+```
+
+This confirms Redis is running correctly on your local system.
 
 ---
 
