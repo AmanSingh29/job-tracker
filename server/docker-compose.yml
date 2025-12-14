@@ -17,9 +17,7 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - WORKER_CONCURRENCY=${WORKER_CONCURRENCY}
+      - JOB_IMPORT_CRON_TIME=${JOB_IMPORT_CRON_TIME}
+      - JOB_BATCH_SIZE=${JOB_BATCH_SIZE}
+      - LOG_LEVEL=${LOG_LEVEL}
     restart: unless-stopped
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:5050/health || exit 1" ]
-      interval: 30s
-      timeout: 5s
-      retries: 3

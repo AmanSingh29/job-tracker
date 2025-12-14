@@ -27,7 +27,7 @@ class JobImportService {
 
       logger.info(`Starting import from feed: ${feedUrl}`);
 
-      const rawJobs = await this.#importJobsFromFeed(feedUrl);
+      const rawJobs = await this.#importAndParseJobsFromFeed(feedUrl);
       stats.totalFetched = rawJobs.length;
 
       logger.info(`Fetched ${stats.totalFetched} jobs from feed`);
@@ -48,7 +48,7 @@ class JobImportService {
     }
   }
 
-  async #importJobsFromFeed(feed_url) {
+  async #importAndParseJobsFromFeed(feed_url) {
     try {
       const jobsInXml = await fetchJobFeedXml(feed_url);
       const parsed = parseXmlString(jobsInXml);
@@ -60,7 +60,7 @@ class JobImportService {
     }
   }
 
-  #transformJobs(rawJobs, stats) {
+  #transformJobs(rawJobs) {
     const transformed = [];
     for (const rawJob of rawJobs) {
       const job = this.#mapRawJobToSchema(rawJob);
