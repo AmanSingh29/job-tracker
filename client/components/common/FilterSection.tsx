@@ -72,7 +72,7 @@ export default function FilterSection({
         <div className="flex items-end">
           <button
             onClick={onClearFilters}
-            className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500"
+            className="w-full cursor-pointer px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500"
           >
             Clear Filters
           </button>

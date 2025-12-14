@@ -76,7 +76,7 @@ export default function DateRangeFilter({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors flex items-center justify-between"
+        className="w-full cursor-pointer px-4 py-2 text-left bg-white border border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors flex items-center justify-between"
       >
         <span
           className={`text-sm ${
@@ -113,7 +113,6 @@ export default function DateRangeFilter({
                 type="date"
                 value={startDate}
                 onChange={(e) => onStartDateChange(e.target.value)}
-                max={endDate || undefined}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </div>
@@ -126,7 +125,6 @@ export default function DateRangeFilter({
                 type="date"
                 value={endDate}
                 onChange={(e) => onEndDateChange(e.target.value)}
-                min={startDate || undefined}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </div>
