@@ -1,5 +1,6 @@
 "use client";
 
+import ClientDate from "@/components/common/ClientDate";
 import { formatDate } from "../common";
 
 export const jobImportHistoryColumn: any[] = [
@@ -15,9 +16,7 @@ export const jobImportHistoryColumn: any[] = [
     key: "created_at",
     label: "Imported At",
     sortable: true,
-    render: (value: string) => (
-      <span className="text-gray-700">{formatDate(value)}</span>
-    ),
+    render: (value: string) => <ClientDate value={value} />,
   },
   {
     key: "total_fetched",
