@@ -3,6 +3,7 @@ const { fetchJobFeedXml } = require("./fetchJobs.service");
 const { parseXmlString } = require("./xmlParser.service");
 const { jobQueue } = require("../queues/jobQueues");
 const logger = require("../utils/logger.ut");
+const { JOB_BATCH_SIZE } = require("../config/env");
 
 class JobImportService {
   async importFromFeed(feedUrl) {
@@ -88,7 +89,7 @@ class JobImportService {
   }
 
   async #queueJobs(jobs, stats, logId) {
-    const BATCH_SIZE = process.env.JOB_BATCH_SIZE || 10000;
+    const BATCH_SIZE = JOB_BATCH_SIZE || 10000;
     const totalJobs = jobs.length;
 
     logger.info(`Queueing ${totalJobs} jobs in batches of ${BATCH_SIZE}`);

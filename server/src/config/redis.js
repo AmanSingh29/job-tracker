@@ -1,10 +1,11 @@
 const { Redis } = require("ioredis");
 const logger = require("../utils/logger.ut");
+const { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } = require("./env");
 
 const redisConfig = {
-  host: process.env.REDIS_HOST,
-  port: parseInt(process.env.REDIS_PORT || "6379"),
-  password: process.env.REDIS_PASSWORD,
+  host: REDIS_HOST,
+  port: parseInt(REDIS_PORT || "6379"),
+  password: REDIS_PASSWORD,
   maxRetriesPerRequest: null,
 };
 

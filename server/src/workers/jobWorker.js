@@ -6,9 +6,10 @@ const {
   updateLogOnSuccess,
   updateLogOnError,
 } = require("../services/processJob.service");
+const { WORKER_CONCURRENCY } = require("../config/env");
 
 const createJobWorker = () => {
-  const concurrency = parseInt(process.env.WORKER_CONCURRENCY || "10", 10);
+  const concurrency = parseInt(WORKER_CONCURRENCY || "10", 10);
   const connection = createRedisConnection();
 
   const worker = new Worker(

@@ -8,7 +8,9 @@ const globalErrorHandlerMw = require("./src/middlewares/globalErrorHandler.mw");
 const express = require("express");
 const cors = require("cors");
 const { createJobWorker } = require("./src/workers/jobWorker");
+const logger = require("./src/utils/logger.ut");
 const port = PORT || 7070;
+require("./src/cron")
 
 app.use(express.json());
 app.use(cors());
@@ -31,7 +33,7 @@ fs.readdirSync("./src/routes").forEach((file) => {
       if (route.route) {
         let routePath = route.route.path;
         let routeMethod = route.route.methods;
-        console.log(
+        logger.info(
           `Route: ${JSON.stringify(routeMethod)}, ${routeName}${routePath}`
         );
       }
@@ -41,4 +43,4 @@ fs.readdirSync("./src/routes").forEach((file) => {
 
 app.use(globalErrorHandlerMw);
 
-app.listen(port, () => console.log(`Server running on port ${port}`));
+app.listen(port, () => logger.info(`Server running on port ${port}`));
