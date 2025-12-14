@@ -6,6 +6,13 @@ class ImportLogRepository {
 
     const pipeline = [
       { $match: filters },
+      {
+        $addFields: {
+          failed_jobs_count: {
+            $size: { $ifNull: ["$failed_jobs", []] },
+          },
+        },
+      },
 
       { $sort: sort },
 
@@ -21,9 +28,7 @@ class ImportLogRepository {
           updated_jobs: 1,
           started_at: 1,
           finished_at: 1,
-          failed_jobs_count: {
-            $size: { $ifNull: ["$failed_jobs", []] },
-          },
+          failed_jobs_count: 1,
           created_at: 1,
           updated_at: 1,
         },

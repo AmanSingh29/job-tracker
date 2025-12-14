@@ -115,6 +115,8 @@ export default function JobImportHistory({ data }: JobImportHistoryProps) {
               data={historyData}
               columns={jobImportHistoryColumn}
               onSort={handleSort}
+              sortKey={filters.sort_by}
+              sortOrder={filters.sort_order}
             />
           </div>
         )}

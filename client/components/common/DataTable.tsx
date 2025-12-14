@@ -1,37 +1,31 @@
 "use client";
 
-import { SortState, TableProps } from "@/types";
+import { TableProps } from "@/types";
 import { ChevronDown, ChevronsUpDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
 
 export function DataTable<T extends Record<string, any>>({
   data,
   columns,
   onSort,
+  sortKey,
+  sortOrder,
 }: TableProps<T>) {
-  const [sortState, setSortState] = useState<SortState>({
-    key: null,
-    direction: null,
-  });
-
   const handleSort = (columnKey: string) => {
     if (!onSort) return;
 
-    let newDirection: "ascending" | "descending" = "ascending";
+    let newDirection: "ascending" | "descending" = "descending";
 
-    if (sortState.key === columnKey) {
-      newDirection = sortState.direction === "ascending" ? "descending" : "ascending";
+    if (sortKey === columnKey) {
+      newDirection = sortOrder === "ascending" ? "descending" : "ascending";
     }
-
-    setSortState({ key: columnKey, direction: newDirection });
     onSort(columnKey, newDirection);
   };
 
   const getSortIcon = (columnKey: string) => {
-    if (sortState.key !== columnKey) {
+    if (sortKey !== columnKey) {
       return <ChevronsUpDown className="w-4 h-4 text-gray-400" />;
     }
-    return sortState.direction === "ascending" ? (
+    return sortOrder === "ascending" ? (
       <ChevronUp className="w-4 h-4 text-blue-600" />
     ) : (
       <ChevronDown className="w-4 h-4 text-blue-600" />

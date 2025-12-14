@@ -10,6 +10,8 @@ export interface TableProps<T> {
   data: T[];
   columns: Column<T>[];
   onSort?: (key: string, direction: "ascending" | "descending") => void;
+  sortKey?: string;
+  sortOrder?: string;
 }
 
 export interface SortState {

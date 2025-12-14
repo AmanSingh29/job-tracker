@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { formatDate } from "../common";
 
@@ -12,8 +12,8 @@ export const jobImportHistoryColumn: any[] = [
     ),
   },
   {
-    key: "started_at",
-    label: "Started At",
+    key: "created_at",
+    label: "Imported At",
     sortable: true,
     render: (value: string) => (
       <span className="text-gray-700">{formatDate(value)}</span>
@@ -37,6 +37,17 @@ export const jobImportHistoryColumn: any[] = [
     className: "text-center",
     render: (value: number) => (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        {value || 0}
+      </span>
+    ),
+  },
+  {
+    key: "new_jobs",
+    label: "New",
+    sortable: true,
+    className: "text-center",
+    render: (value: number) => (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
         {value || 0}
       </span>
     ),
